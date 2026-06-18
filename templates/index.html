@@ -23,7 +23,6 @@
   --orange:  #E87722;
   --blue:    #0067FF;
 
-  /* dark canvas tokens (VSE chart / timeline bars) */
   --dk:      #0C0F16;
   --dk1:     #10141C;
   --dk2:     #161C28;
@@ -49,9 +48,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ══════════════════════════════
-   SIDEBAR NAV — white, editorial
-══════════════════════════════ */
+/*SIDEBAR NAV*/
 .sidebar {
   width: var(--nav-w);
   background: var(--black);
@@ -64,7 +61,6 @@ body {
   flex-shrink: 0;
 }
 
-/* Checkered pattern header in sidebar */
 .sidebar-brand {
   padding: 0 20px;
   height: var(--hdr-h);
@@ -77,7 +73,6 @@ body {
   flex-shrink: 0;
 }
 
-/* Subtle checkered overlay */
 .sidebar-brand::before {
   content: '';
   position: absolute;
@@ -168,9 +163,7 @@ body {
   line-height: 1.8;
 }
 
-/* ══════════════════════════════
-   MAIN
-══════════════════════════════ */
+/* MAIN*/
 .main {
   margin-left: var(--nav-w);
   flex: 1;
@@ -179,7 +172,6 @@ body {
   min-height: 100vh;
 }
 
-/* ── Top bar — red with checkered ── */
 .topbar {
   height: var(--hdr-h);
   background: var(--red);
@@ -275,13 +267,10 @@ body {
   background: rgba(255,255,255,0.3);
 }
 
-/* ══════════════════════════════
-   PAGES
-══════════════════════════════ */
+/* PAGES*/
 .page { display: none; flex-direction: column; flex: 1; }
 .page.active { display: flex; }
 
-/* Page header — white bar with italic display type */
 .pg-hdr {
   background: #fff;
   border-bottom: 3px solid var(--red);
@@ -383,7 +372,6 @@ select:focus { border-color: var(--red); border-bottom-color: var(--red); }
 .btn:active { opacity: 0.85; }
 .btn:disabled { background: var(--grey3); cursor: not-allowed; }
 
-/* Ghost variant */
 .btn-ghost {
   background: transparent;
   border: 1.5px solid var(--red);
@@ -427,11 +415,8 @@ select:focus { border-color: var(--red); border-bottom-color: var(--red); }
   margin-top: 10px;
 }
 
-/* ══════════════════════════════
-   RACE SIMULATION — Results
-══════════════════════════════ */
+/* RACE SIMULATION — Results */
 
-/* Section wrapper */
 .panel {
   background: #fff;
   border: 1px solid var(--grey2);
@@ -459,7 +444,6 @@ select:focus { border-color: var(--red); border-bottom-color: var(--red); }
 .panel-body { padding: 16px 18px; }
 .panel-body-flush { padding: 0; }
 
-/* Podium — 3-col white cards with top-border accent */
 .podium {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -480,7 +464,6 @@ select:focus { border-color: var(--red); border-bottom-color: var(--red); }
 .podium-cell:nth-child(2) { border-top: 3px solid var(--muted); }
 .podium-cell:nth-child(3) { border-top: 3px solid var(--muted); }
 
-/* Huge ghost number */
 .podium-ghost {
   position: absolute;
   right: 8px; bottom: -8px;
@@ -532,7 +515,6 @@ select:focus { border-color: var(--red); border-bottom-color: var(--red); }
   margin-top: 8px;
 }
 
-/* Meta strip */
 .meta-strip {
   display: flex;
   gap: 0;
@@ -591,7 +573,6 @@ select:focus { border-color: var(--red); border-bottom-color: var(--red); }
   position: relative;
 }
 
-/* F1-red pit tick between stints */
 .tl-seg + .tl-seg::before {
   content: '';
   position: absolute;
@@ -712,9 +693,7 @@ select:focus { border-color: var(--red); border-bottom-color: var(--red); }
   text-overflow: ellipsis;
 }
 
-/* ══════════════════════════════
-   MODEL EVALUATION
-══════════════════════════════ */
+/* MODEL EVALUATION*/
 .model-block { margin-bottom: 32px; }
 
 .model-hdr {
@@ -795,7 +774,6 @@ select:focus { border-color: var(--red); border-bottom-color: var(--red); }
   text-transform: uppercase;
 }
 
-/* Metric grid */
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -839,7 +817,6 @@ select:focus { border-color: var(--red); border-bottom-color: var(--red); }
 .v-warn { color: var(--orange); }
 .v-bad  { color: var(--red); }
 
-/* CM + charts */
 .eval-cols {
   display: grid;
   grid-template-columns: auto 1fr 1fr;
@@ -896,9 +873,7 @@ select:focus { border-color: var(--red); border-bottom-color: var(--red); }
   margin: 28px 0;
 }
 
-/* ══════════════════════════════
-   VSE VIEWER — dark canvas only
-══════════════════════════════ */
+/* VSE VIEWER*/
 .vse-empty {
   background: #fff;
   border: 1px solid var(--grey2);
@@ -976,7 +951,6 @@ input[type="range"]::-webkit-slider-thumb {
   border: none;
 }
 
-/* ── Misc ── */
 details { margin-top: 12px; }
 
 summary {
@@ -1008,9 +982,7 @@ pre {
   overflow-y: auto;
 }
 
-/* ══════════════════════════════
-   VSE TAB STRIP
-══════════════════════════════ */
+/* VSE TAB STRIP*/
 .vse-tabs {
   display: none;
   background: #fff;
@@ -1212,7 +1184,7 @@ pre {
 </head>
 <body>
 
-<!-- ══════════ SIDEBAR ══════════ -->
+<!--SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-brand">
     <div class="brand-slash">F1</div>
@@ -1250,7 +1222,7 @@ pre {
 
 </aside>
 
-<!-- ══════════ MAIN ══════════ -->
+<!--MAIN -->
 <div class="main">
 
   <!-- Red topbar -->
@@ -1271,7 +1243,7 @@ pre {
     </div>
   </div>
 
-  <!-- ══ PAGE: Race Simulation ══ -->
+  <!-- PAGE: Race Simulation  -->
   <div id="page-simulate" class="page active">
     <div class="pg-hdr">
       <div class="pg-eyebrow">Monte Carlo · Neural Network Strategy</div>
@@ -1344,9 +1316,9 @@ pre {
 
       </div>
     </div>
-  </div><!-- /simulate -->
+  </div>
 
-  <!-- ══ PAGE: Model Evaluation ══ -->
+  <!--  PAGE: Model Evaluation  -->
   <div id="page-evaluate" class="page">
     <div class="pg-hdr">
       <div class="pg-eyebrow">Held-out Test Set · Season 2019</div>
@@ -1413,9 +1385,9 @@ pre {
 
       </div>
     </div>
-  </div><!-- /evaluate -->
+  </div>
 
-  <!-- ══ PAGE: VSE Viewer ══ -->
+  <!--  PAGE: VSE Viewer  -->
   <div id="page-vse" class="page">
     <div class="pg-hdr">
       <div class="pg-eyebrow">NN1 · NN2 Output · Decision Replay</div>
@@ -1425,7 +1397,7 @@ pre {
 
     <div class="pg-body">
 
-      <!-- Driver selector — shared by both tabs -->
+      <!-- Driver selector -->
       <div class="vse-ctrl-row" id="vse-controls">
         <div class="ctrl-field">
           <div class="ctrl-lbl">Driver</div>
@@ -1473,14 +1445,12 @@ pre {
       </div>
 
     </div>
-  </div><!-- /vse -->
+  </div>
 
-</div><!-- /main -->
+</div>
 
 <script>
-// ══════════════════════════════════════════════════════
 // Navigation
-// ══════════════════════════════════════════════════════
 const PAGE_MAP = {
   simulate: 'Race Simulation',
   evaluate: 'Model Evaluation',
@@ -1495,9 +1465,7 @@ function showPage(name, el) {
   document.getElementById('topbar-title').textContent = PAGE_MAP[name] || name;
 }
 
-// ══════════════════════════════════════════════════════
 // Compound lookup
-// ══════════════════════════════════════════════════════
 const CMP = {
   Hypersoft:    { bg:'#FF1493', txt:'#000', abbr:'HS' },
   Ultrasoft:    { bg:'#8B008B', txt:'#fff', abbr:'US' },
@@ -1522,9 +1490,7 @@ function resolveCmp(name) {
   return CMP[name] || { bg:'#888', txt:'#fff', abbr:name[0] };
 }
 
-// ══════════════════════════════════════════════════════
 // Team data
-// ══════════════════════════════════════════════════════
 const TEAM_CLR = {
   HAM:'#00D2BE',BOT:'#00D2BE',ROS:'#00D2BE',
   VET:'#DC0000',RAI:'#DC0000',LEC:'#DC0000',
@@ -1588,9 +1554,7 @@ const DRIVER_NAME = {
   NAS: 'Nasr'
 };
 
-// ══════════════════════════════════════════════════════
 // Status pip
-// ══════════════════════════════════════════════════════
 function setPip(state) {
   const p = document.getElementById('status-pip');
   p.style.background =
@@ -1599,9 +1563,7 @@ function setPip(state) {
   : 'rgba(255,255,255,0.25)';
 }
 
-// ══════════════════════════════════════════════════════
 // Simulation
-// ══════════════════════════════════════════════════════
 async function runSimulation() {
   const race   = document.getElementById('race-select').value;
   const btn    = document.getElementById('sim-btn');
@@ -1763,9 +1725,7 @@ function renderSim(d) {
   }
 }
 
-// ══════════════════════════════════════════════════════
 // Model Evaluation
-// ══════════════════════════════════════════════════════
 async function runEvaluation() {
   const status = document.getElementById('eval-status');
   const err    = document.getElementById('eval-error');
@@ -1848,16 +1808,13 @@ function renderEval(d) {
   document.getElementById('cc-bar-img').src=cc.bar_img;
 }
 
-// ══════════════════════════════════════════════════════
 // VSE Viewer — NN1 + NN2
-// ══════════════════════════════════════════════════════
 let vseData=null, vseMap={}, vsePlaying=false;
 let vseLap=0, vseMax=0, vseFrame=null;
 let ccData=null;           // cc_probs from app.py
 let activeVseTab='nn1';    // 'nn1' | 'nn2'
 let activeNn2Driver=null;
 
-// ── Tab switching ──
 function switchVseTab(tab, el) {
   activeVseTab = tab;
   document.querySelectorAll('.vse-tab').forEach(t => t.classList.remove('active'));
