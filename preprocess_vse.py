@@ -25,7 +25,7 @@ DB_PATH = sys.argv[1] if len(sys.argv) > 1 else next(
 )
 
 # ---------------------------------------------------------------------------
-# Track category mapping  (from Heilmeier et al. parameter files)
+# Track category mapping
 # ---------------------------------------------------------------------------
 TRACK_CATEGORY = {
     "Austin": 2, "Baku": 2, "Budapest": 2, "Catalunya": 1,
