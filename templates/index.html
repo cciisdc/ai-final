@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VSE · Virtual Strategy Engineer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,900;1,700;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red:     #E10600;
+  --red-dk:  #A80000;
+  --black:   #15151E;
+  --grey1:   #F4F5F7;
+  --grey2:   #E8E9ED;
+  --grey3:   #C8CAD4;
+  --muted:   #67676F;
+  --text:    #1E1E28;
+  --gold:    #C8A84B;
+  --green:   #00A848;
+  --orange:  #E87722;
+  --blue:    #0067FF;
+
+  /* dark canvas tokens (VSE chart / timeline bars) */
+  --dk:      #0C0F16;
+  --dk1:     #10141C;
+  --dk2:     #161C28;
+  --dk-line: #1E2536;
+  --dk-muted:#5A6380;
+
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', system-ui, sans-serif;
+
+  --nav-w:  220px;
+  --hdr-h:  52px;
+}
+
+html { font-size: 13px; }
+
+body {
+  background: var(--grey1);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.5;
+  display: flex;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ══════════════════════════════
+   SIDEBAR NAV — white, editorial
+══════════════════════════════ */
+.sidebar {
+  width: var(--nav-w);
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 300;
+  flex-shrink: 0;
+}
+
+/* Checkered pattern header in sidebar */
+.sidebar-brand {
+  padding: 0 20px;
+  height: var(--hdr-h);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  background: var(--red);
+  flex-shrink: 0;
+}
+
+/* Subtle checkered overlay */
+.sidebar-brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,0.06) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.06) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.06) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.06) 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+  pointer-events: none;
+}
+
+.brand-mark {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.06em;
+  position: relative;
+  z-index: 1;
+}
+
+.brand-slash {
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+  font-family: var(--sans);
+}
+
+.sidebar-section-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5A5A70;
+  padding: 18px 20px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  color: #8888A0;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.1s, background 0.1s;
+  user-select: none;
+  border-left: 2px solid transparent;
+}
+
+.nav-item:hover { color: #fff; background: rgba(255,255,255,0.04); }
+
+.nav-item.active {
+  color: #fff;
+  border-left-color: var(--red);
+  background: rgba(225,6,0,0.1);
+}
+
+.nav-icon {
+  width: 15px; height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.sidebar-spacer { flex: 1; }
+
+.sidebar-foot {
+  padding: 14px 20px;
+  border-top: 1px solid #232330;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: #42424F;
+  letter-spacing: 0.08em;
+  line-height: 1.8;
+}
+
+/* ══════════════════════════════
+   MAIN
+══════════════════════════════ */
+.main {
+  margin-left: var(--nav-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Top bar — red with checkered ── */
+.topbar {
+  height: var(--hdr-h);
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 0;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.topbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(45deg, rgba(0,0,0,0.06) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(0,0,0,0.06) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.06) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.06) 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+  pointer-events: none;
+}
+
+.topbar-title {
+  font-size: 13px;
+  font-weight: 700;
+  font-style: italic;
+  color: #fff;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
+
+.topbar-sep {
+  width: 1px;
+  height: 16px;
+  background: rgba(255,255,255,0.25);
+  margin: 0 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.topbar-ctx {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.05em;
+  position: relative;
+  z-index: 1;
+}
+
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.topbar-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.topbar-stat-lbl {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+
+.topbar-stat-val {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.status-pip {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+}
+
+/* ══════════════════════════════
+   PAGES
+══════════════════════════════ */
+.page { display: none; flex-direction: column; flex: 1; }
+.page.active { display: flex; }
+
+/* Page header — white bar with italic display type */
+.pg-hdr {
+  background: #fff;
+  border-bottom: 3px solid var(--red);
+  padding: 20px 28px 18px;
+}
+
+.pg-eyebrow {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 4px;
+}
+
+.pg-title {
+  font-size: 26px;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--black);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.pg-desc {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 6px;
+  max-width: 520px;
+  line-height: 1.65;
+}
+
+.pg-body { padding: 22px 28px; flex: 1; }
+
+/* ── Controls ── */
+.ctrl-row {
+  background: #fff;
+  border: 1px solid var(--grey2);
+  border-top: 3px solid var(--black);
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.ctrl-field { display: flex; flex-direction: column; gap: 5px; }
+
+.ctrl-lbl {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+select {
+  background: #fff;
+  border: 1px solid var(--grey3);
+  border-bottom: 2px solid var(--black);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 7px 32px 7px 10px;
+  outline: none;
+  min-width: 220px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2367676F'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color 0.1s;
+}
+
+select:focus { border-color: var(--red); border-bottom-color: var(--red); }
+
+.btn {
+  padding: 8px 22px;
+  background: var(--red);
+  border: none;
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.1s;
+  white-space: nowrap;
+}
+
+.btn:hover { background: var(--red-dk); }
+.btn:active { opacity: 0.85; }
+.btn:disabled { background: var(--grey3); cursor: not-allowed; }
+
+/* Ghost variant */
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--red);
+  color: var(--red);
+}
+.btn-ghost:hover { background: var(--red); color: #fff; }
+.btn-ghost:disabled { border-color: var(--grey3); color: var(--grey3); background: transparent; }
+
+/* ── Status / error ── */
+.status-row {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  margin-top: 10px;
+}
+
+.status-row.visible { display: flex; }
+
+.spinner {
+  width: 12px; height: 12px;
+  border: 2px solid var(--grey2);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg {
+  display: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--red);
+  border-left: 3px solid var(--red);
+  padding: 8px 12px;
+  background: #FFF5F5;
+  margin-top: 10px;
+}
+
+/* ══════════════════════════════
+   RACE SIMULATION — Results
+══════════════════════════════ */
+
+/* Section wrapper */
+.panel {
+  background: #fff;
+  border: 1px solid var(--grey2);
+  margin-bottom: 20px;
+}
+
+.panel-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--grey2);
+  background: var(--grey1);
+}
+
+.panel-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel-body { padding: 16px 18px; }
+.panel-body-flush { padding: 0; }
+
+/* Podium — 3-col white cards with top-border accent */
+.podium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--grey2);
+  border: 1px solid var(--grey2);
+  margin-bottom: 20px;
+}
+
+.podium-cell {
+  background: #fff;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.podium-cell:first-child { border-top: 3px solid var(--gold); }
+.podium-cell:nth-child(2) { border-top: 3px solid var(--muted); }
+.podium-cell:nth-child(3) { border-top: 3px solid var(--muted); }
+
+/* Huge ghost number */
+.podium-ghost {
+  position: absolute;
+  right: 8px; bottom: -8px;
+  font-family: var(--sans);
+  font-size: 72px;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--grey2);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.04em;
+}
+
+.podium-lbl {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.podium-drv {
+  font-family: var(--sans);
+  font-size: 22px;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--black);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.podium-team {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 3px;
+  font-family: var(--mono);
+  letter-spacing: 0.03em;
+}
+
+.podium-val {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--red);
+  margin-top: 8px;
+}
+
+/* Meta strip */
+.meta-strip {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  border: 1px solid var(--grey2);
+  background: #fff;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 7px 16px;
+  border-right: 1px solid var(--grey2);
+  white-space: nowrap;
+}
+
+.meta-chip:last-child { border-right: none; }
+.meta-chip.ok { color: var(--green); }
+
+/* ── Timeline ── */
+.tl-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.tl-drv {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--black);
+  width: 90px;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+}
+
+.tl-bar {
+  flex: 1;
+  height: 18px;
+  background: var(--grey2);
+  display: flex;
+  overflow: hidden;
+}
+
+.tl-seg {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* F1-red pit tick between stints */
+.tl-seg + .tl-seg::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 2px; height: 100%;
+  background: var(--red);
+  z-index: 2;
+}
+
+.tl-seg-lbl {
+  font-family: var(--mono);
+  font-size: 7px;
+  font-weight: 700;
+  color: rgba(0,0,0,0.55);
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.03em;
+}
+
+.tl-stops {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+}
+
+.tl-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.tl-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tl-swatch { width: 10px; height: 10px; flex-shrink: 0; }
+
+/* ── Classification table ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.data-table thead th {
+  background: var(--grey1);
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 9px 14px;
+  text-align: left;
+  border-bottom: 2px solid var(--grey2);
+  white-space: nowrap;
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--grey2);
+  transition: background 0.08s;
+}
+
+.data-table tbody tr:hover { background: var(--grey1); }
+.data-table tbody td { padding: 9px 14px; white-space: nowrap; }
+
+.td-pos { font-weight: 700; font-size: 14px; color: var(--black); }
+.pos-1 { color: var(--gold); }
+.pos-2 { color: #888; }
+.pos-3 { color: #A06020; }
+.pos-dnf { color: var(--red); }
+
+.drv-wrap { display: flex; align-items: center; gap: 8px; }
+.drv-bar { width: 3px; height: 22px; flex-shrink: 0; }
+.drv-name { font-weight: 700; color: var(--black); font-size: 11px; letter-spacing: 0.02em; }
+.drv-team { font-size: 8px; color: var(--muted); margin-top: 1px; letter-spacing: 0.04em; }
+
+.td-dim { color: var(--muted); }
+.td-val { color: var(--text); font-weight: 500; }
+
+.st-fin {
+  font-size: 8px; font-weight: 700;
+  color: var(--green);
+  letter-spacing: 0.1em;
+  background: #EEF9F2;
+  padding: 2px 6px;
+  border: 1px solid #B8E8C4;
+}
+
+.st-dnf {
+  font-size: 8px; font-weight: 700;
+  color: var(--red);
+  letter-spacing: 0.1em;
+  background: #FFF0F0;
+  padding: 2px 6px;
+  border: 1px solid #FFB8B8;
+}
+
+.strat-cell {
+  font-size: 9px;
+  color: var(--muted);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ══════════════════════════════
+   MODEL EVALUATION
+══════════════════════════════ */
+.model-block { margin-bottom: 32px; }
+
+.model-hdr {
+  border-top: 3px solid var(--black);
+  background: var(--black);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.model-nn-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  background: var(--red);
+  color: #fff;
+  padding: 3px 8px;
+  flex-shrink: 0;
+}
+
+.model-nn-name {
+  font-size: 14px;
+  font-weight: 700;
+  font-style: italic;
+  color: #fff;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.model-nn-score {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.06em;
+}
+
+.model-nn-score span {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.model-body {
+  background: #fff;
+  border: 1px solid var(--grey2);
+  border-top: none;
+  padding: 18px;
+}
+
+.model-meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.model-meta-item {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.model-meta-tag {
+  border: 1px solid var(--grey2);
+  padding: 2px 8px;
+  background: var(--grey1);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Metric grid */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--grey2);
+  border: 1px solid var(--grey2);
+  margin-bottom: 18px;
+}
+
+.metric-cell {
+  background: var(--grey1);
+  padding: 14px 16px;
+}
+
+.metric-cell-lbl {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.metric-cell-val {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.metric-cell-desc {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--grey3);
+  letter-spacing: 0.02em;
+}
+
+.v-good { color: var(--green); }
+.v-warn { color: var(--orange); }
+.v-bad  { color: var(--red); }
+
+/* CM + charts */
+.eval-cols {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.cm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--grey2);
+  border: 1px solid var(--grey2);
+}
+
+.cm-cell {
+  background: #fff;
+  padding: 12px 14px;
+  text-align: center;
+  min-width: 78px;
+}
+
+.cm-val {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.cm-lbl {
+  font-family: var(--mono);
+  font-size: 7px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.cm-tp .cm-val { color: var(--green); }
+.cm-tn .cm-val { color: var(--blue); }
+.cm-fp .cm-val { color: var(--orange); }
+.cm-fn .cm-val { color: var(--red); }
+
+.eval-chart img {
+  width: 100%;
+  border: 1px solid var(--grey2);
+  display: block;
+}
+
+.eval-divider {
+  border: none;
+  border-top: 1px solid var(--grey2);
+  margin: 28px 0;
+}
+
+/* ══════════════════════════════
+   VSE VIEWER — dark canvas only
+══════════════════════════════ */
+.vse-empty {
+  background: #fff;
+  border: 1px solid var(--grey2);
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.vse-empty-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--grey3);
+  margin-bottom: 8px;
+}
+
+.vse-empty-text { font-size: 12px; color: var(--muted); }
+
+.vse-ctrl-row {
+  display: none;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid var(--grey2);
+  border-bottom: none;
+  padding: 14px 18px;
+}
+
+.vse-canvas-wrap { display: none; }
+
+.vse-canvas-wrap canvas {
+  width: 100%;
+  display: block;
+  background: var(--dk1);
+  border: 1px solid var(--grey2);
+  border-top: none;
+}
+
+.vse-scrub-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--dk);
+  border: 1px solid var(--grey2);
+  border-top: none;
+  padding: 10px 18px;
+}
+
+.vse-lap-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dk-muted);
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+}
+
+.vse-lap-lbl span { color: var(--gold); font-weight: 700; }
+
+input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 2px;
+  background: var(--dk-line);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px; height: 10px;
+  background: var(--red);
+  border-radius: 0;
+  cursor: pointer;
+  border: none;
+}
+
+/* ── Misc ── */
+details { margin-top: 12px; }
+
+summary {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  padding: 5px 0;
+  border-top: 1px solid var(--grey2);
+  margin-top: 12px;
+}
+
+summary:hover { color: var(--text); }
+
+pre {
+  background: var(--dk1);
+  border: 1px solid var(--grey2);
+  padding: 12px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--dk-muted);
+  overflow-x: auto;
+  margin-top: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+/* ══════════════════════════════
+   VSE TAB STRIP
+══════════════════════════════ */
+.vse-tabs {
+  display: none;
+  background: #fff;
+  border: 1px solid var(--grey2);
+  border-bottom: none;
+  padding: 0 18px;
+  gap: 0;
+}
+
+.vse-tab {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 11px 16px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.1s, border-color 0.1s;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vse-tab:hover { color: var(--text); }
+.vse-tab.active { color: var(--red); border-bottom-color: var(--red); }
+
+.vse-tab-tag {
+  font-size: 8px;
+  padding: 1px 5px;
+  background: var(--grey2);
+  color: var(--muted);
+}
+
+.vse-tab.active .vse-tab-tag {
+  background: var(--red);
+  color: #fff;
+}
+
+/* ── NN2 Compound Decision Panel ── */
+.nn2-panel {
+  display: none;
+  background: #fff;
+  border: 1px solid var(--grey2);
+  border-top: none;
+}
+
+.nn2-driver-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--grey2);
+  padding: 0 18px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+
+.nn2-drv-tab {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 9px 12px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  transition: color 0.1s;
+  flex-shrink: 0;
+}
+
+.nn2-drv-tab:hover { color: var(--text); }
+.nn2-drv-tab.active { color: var(--red); border-bottom-color: var(--red); }
+
+.nn2-content { padding: 18px; }
+
+/* Pit stop decision cards */
+.nn2-stops {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nn2-stop-card {
+  background: var(--grey1);
+  border: 1px solid var(--grey2);
+  border-left: 3px solid var(--red);
+  padding: 14px 16px;
+}
+
+.nn2-stop-hdr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.nn2-stop-lap {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+
+.nn2-stop-lap span {
+  color: var(--red);
+}
+
+.nn2-stop-chosen {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  margin-left: auto;
+}
+
+/* Compound probability bars */
+.nn2-options {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.nn2-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nn2-option-name {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  width: 90px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nn2-cmp-dot {
+  width: 8px; height: 8px;
+  flex-shrink: 0;
+}
+
+.nn2-bar-track {
+  flex: 1;
+  height: 14px;
+  background: var(--grey2);
+  position: relative;
+  overflow: hidden;
+}
+
+.nn2-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.nn2-option-pct {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  width: 38px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.nn2-option.chosen .nn2-option-name { color: var(--text); }
+.nn2-option.chosen .nn2-option-pct  { color: var(--red); }
+
+.nn2-empty {
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 1000px) {
+  .eval-cols { grid-template-columns: 1fr 1fr; }
+  .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .podium { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  :root { --nav-w: 0px; }
+  .sidebar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-slash">F1</div>
+    <div class="brand-mark">VSE</div>
+  </div>
+
+  <div class="sidebar-section-label">Workspace</div>
+
+  <div class="nav-item active" onclick="showPage('simulate',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24">
+      <path d="M3 17l4-8 4 4 4-6 4 5"/>
+      <circle cx="19" cy="17" r="2"/>
+      <circle cx="5" cy="17" r="2"/>
+    </svg>
+    Race Simulation
+  </div>
+
+  <div class="nav-item" onclick="showPage('evaluate',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18"/>
+      <path d="M3 9h18M9 21V9"/>
+    </svg>
+    Model Evaluation
+  </div>
+
+  <div class="nav-item" onclick="showPage('vse',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+    VSE Decision Viewer
+  </div>
+
+  <div class="sidebar-spacer"></div>
+
+
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="main">
+
+  <!-- Red topbar -->
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Race Simulation</div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-ctx" id="topbar-ctx">Select a race</div>
+    <div class="topbar-right">
+      <div class="topbar-stat" id="hdr-tc" style="display:none">
+        <span class="topbar-stat-lbl">TC · F1</span>
+        <span class="topbar-stat-val" id="hdr-tc-val">—</span>
+      </div>
+      <div class="topbar-stat" id="hdr-cc" style="display:none">
+        <span class="topbar-stat-lbl">CC · Acc</span>
+        <span class="topbar-stat-val" id="hdr-cc-val">—</span>
+      </div>
+      <div class="status-pip" id="status-pip"></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: Race Simulation ══ -->
+  <div id="page-simulate" class="page active">
+    <div class="pg-hdr">
+      <div class="pg-eyebrow">Monte Carlo · Neural Network Strategy</div>
+      <div class="pg-title">Race Simulation</div>
+      <div class="pg-desc">Select a race and run a full Monte Carlo simulation. The VSE neural networks determine pit timing (NN1) and compound selection (NN2) for every driver on every lap.</div>
+    </div>
+
+    <div class="pg-body">
+      <div class="ctrl-row">
+        <div class="ctrl-field">
+          <div class="ctrl-lbl">Race</div>
+          <select id="race-select" style="min-width:260px">
+            {% for r in ini_files %}
+            <option value="{{ r }}">{{ r.replace('_', ' ') }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button class="btn" id="sim-btn" onclick="runSimulation()">Run Simulation</button>
+        <div class="status-row" id="sim-status" style="margin-top:0">
+          <div class="spinner"></div>
+          <span id="sim-status-text">Running…</span>
+        </div>
+      </div>
+
+      <div class="error-msg" id="sim-error"></div>
+
+      <div id="sim-results" style="display:none">
+
+        <!-- Podium -->
+        <div class="podium" id="sim-podium"></div>
+
+        <!-- Meta -->
+        <div class="meta-strip" id="sim-meta"></div>
+
+        <!-- Strategy Timeline -->
+        <div class="panel">
+          <div class="panel-hdr">
+            <div class="panel-label">Strategy Timeline · Pit stops marked in red</div>
+            <div class="tl-legend" id="tl-legend"></div>
+          </div>
+          <div class="panel-body">
+            <div id="tl-chart"></div>
+          </div>
+        </div>
+
+        <!-- Classification -->
+        <div class="panel">
+          <div class="panel-hdr">
+            <div class="panel-label">Final Classification</div>
+            <div id="sim-count" style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:.1em"></div>
+          </div>
+          <div class="panel-body-flush">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Pos</th><th>Driver</th><th>#</th>
+                  <th>Race Time</th><th>Gap</th><th>Int</th>
+                  <th>Best Lap</th><th>Laps</th><th>ST</th><th>Strategy</th>
+                </tr>
+              </thead>
+              <tbody id="sim-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <details>
+          <summary>Raw Simulation Output</summary>
+          <pre id="sim-raw"></pre>
+        </details>
+
+      </div>
+    </div>
+  </div><!-- /simulate -->
+
+  <!-- ══ PAGE: Model Evaluation ══ -->
+  <div id="page-evaluate" class="page">
+    <div class="pg-hdr">
+      <div class="pg-eyebrow">Held-out Test Set · Season 2019</div>
+      <div class="pg-title">Model Evaluation</div>
+      <div class="pg-desc">Performance of both VSE neural networks on the 2019 season test set. NN1 (Tire-Change) uses a hybrid FFNN + LSTM. NN2 (Compound-Choice) is a feedforward network activated only when NN1 decides to pit.</div>
+    </div>
+
+    <div class="pg-body">
+      <div class="status-row" id="eval-status" style="margin-bottom:16px;margin-top:0">
+        <div class="spinner"></div>
+        <span>Loading evaluation results…</span>
+      </div>
+      <div class="error-msg" id="eval-error"></div>
+
+      <div id="eval-results" style="display:none">
+
+        <!-- NN1 / TC -->
+        <div class="model-block">
+          <div class="model-hdr">
+            <div class="model-nn-tag">NN1</div>
+            <div class="model-nn-name">Tire-Change · Pit Stop Decision</div>
+            <div class="model-nn-score" id="badge-tc">F1 <span>—</span></div>
+          </div>
+          <div class="model-body">
+            <div class="model-meta">
+              <span class="model-meta-item">Hybrid FFNN + LSTM</span>
+              <span class="model-meta-item" id="tc-meta-samples"></span>
+              <span class="model-meta-tag" id="tc-meta-balance"></span>
+            </div>
+
+            <div class="metric-grid" id="tc-metrics"></div>
+
+            <div class="eval-cols">
+              <div class="cm-grid" id="tc-cm"></div>
+              <div class="eval-chart"><img id="tc-cm-img" alt="TC Confusion Matrix"></div>
+              <div class="eval-chart"><img id="tc-bar-img" alt="TC Metric Bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="eval-divider">
+
+        <!-- NN2 / CC -->
+        <div class="model-block">
+          <div class="model-hdr">
+            <div class="model-nn-tag">NN2</div>
+            <div class="model-nn-name">Compound-Choice · Tire Selection</div>
+            <div class="model-nn-score" id="badge-cc">Acc <span>—</span></div>
+          </div>
+          <div class="model-body">
+            <div class="model-meta">
+              <span class="model-meta-item">FFNN · activated when NN1 decides pit</span>
+              <span class="model-meta-item" id="cc-meta-samples"></span>
+            </div>
+
+            <div class="metric-grid" id="cc-metrics"></div>
+
+            <div class="eval-cols" style="grid-template-columns:1fr 1fr">
+              <div class="eval-chart"><img id="cc-cm-img" alt="CC Confusion Matrix"></div>
+              <div class="eval-chart"><img id="cc-bar-img" alt="CC Metric Bar"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- /evaluate -->
+
+  <!-- ══ PAGE: VSE Viewer ══ -->
+  <div id="page-vse" class="page">
+    <div class="pg-hdr">
+      <div class="pg-eyebrow">NN1 · NN2 Output · Decision Replay</div>
+      <div class="pg-title">VSE Decision Viewer</div>
+      <div class="pg-desc">Replay the VSE's lap-by-lap decisions. NN1 shows pit-stop probability per driver per lap. NN2 shows compound choice probabilities at each actual pit stop.</div>
+    </div>
+
+    <div class="pg-body">
+
+      <!-- Driver selector — shared by both tabs -->
+      <div class="vse-ctrl-row" id="vse-controls">
+        <div class="ctrl-field">
+          <div class="ctrl-lbl">Driver</div>
+          <select id="vse-d1" onchange="onDriverChange()"></select>
+        </div>
+        <div class="ctrl-field">
+          <div class="ctrl-lbl">Compare (NN1 only)</div>
+          <select id="vse-d2" onchange="onDriverChange()">
+            <option value="">None</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost" id="vse-play-btn" onclick="togglePlay()">▶ Play</button>
+      </div>
+
+      <!-- Empty state -->
+      <div class="vse-empty" id="vse-empty">
+        <div class="vse-empty-lbl">No Data</div>
+        <div class="vse-empty-text">Run a race simulation first, then return here to inspect the VSE's decisions.</div>
+      </div>
+
+      <!-- Tab strip -->
+      <div class="vse-tabs" id="vse-tabs" style="display:flex">
+        <div class="vse-tab active" onclick="switchVseTab('nn1',this)">
+          <span class="vse-tab-tag">NN1</span> Pit Stop Probability
+        </div>
+        <div class="vse-tab" onclick="switchVseTab('nn2',this)">
+          <span class="vse-tab-tag">NN2</span> Compound Choice
+        </div>
+      </div>
+
+      <!-- NN1: existing canvas -->
+      <div class="vse-canvas-wrap" id="vse-canvas-wrap">
+        <canvas id="vse-canvas" width="1100" height="400"></canvas>
+        <div class="vse-scrub-row">
+          <div class="vse-lap-lbl">Lap <span id="vse-lap">0</span> / <span id="vse-lap-tot">0</span></div>
+          <input type="range" id="vse-scrubber" min="0" max="100" value="0" oninput="onScrub()">
+          <div style="font-family:var(--mono);font-size:8px;color:var(--dk-muted);letter-spacing:.1em">DRAG TO SCRUB</div>
+        </div>
+      </div>
+
+      <!-- NN2: compound decision panel -->
+      <div class="nn2-panel" id="nn2-panel">
+        <div class="nn2-driver-tabs" id="nn2-drv-tabs"></div>
+        <div class="nn2-content" id="nn2-content"></div>
+      </div>
+
+    </div>
+  </div><!-- /vse -->
+
+</div><!-- /main -->
+
+<script>
+// ══════════════════════════════════════════════════════
+// Navigation
+// ══════════════════════════════════════════════════════
+const PAGE_MAP = {
+  simulate: 'Race Simulation',
+  evaluate: 'Model Evaluation',
+  vse:      'VSE Decision Viewer',
+};
+
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('topbar-title').textContent = PAGE_MAP[name] || name;
+}
+
+// ══════════════════════════════════════════════════════
+// Compound lookup
+// ══════════════════════════════════════════════════════
+const CMP = {
+  Hypersoft:    { bg:'#FF1493', txt:'#000', abbr:'HS' },
+  Ultrasoft:    { bg:'#8B008B', txt:'#fff', abbr:'US' },
+  Supersoft:    { bg:'#CC0000', txt:'#fff', abbr:'SS' },
+  Superhard:    { bg:'#003366', txt:'#fff', abbr:'SH' },
+  Soft:         { bg:'#D4A000', txt:'#000', abbr:'S'  },
+  Medium:       { bg:'#C8C8C8', txt:'#000', abbr:'M'  },
+  Hard:         { bg:'#1A4A8A', txt:'#fff', abbr:'H'  },
+  Intermediate: { bg:'#006400', txt:'#fff', abbr:'I'  },
+  Wet:          { bg:'#00339A', txt:'#fff', abbr:'W'  },
+  'C1': { bg:'#1A4A8A', txt:'#fff', abbr:'C1' },
+  'C2': { bg:'#C8C8C8', txt:'#000', abbr:'C2' },
+  'C3': { bg:'#D4A000', txt:'#000', abbr:'C3' },
+  'C4': { bg:'#CC0000', txt:'#fff', abbr:'C4' },
+  'C5': { bg:'#8B008B', txt:'#fff', abbr:'C5' },
+};
+
+function resolveCmp(name) {
+  if (!name) return { bg:'#ccc', txt:'#000', abbr:'?' };
+  const m = name.match(/^(C\d)/);
+  if (m) return CMP[m[1]] || { bg:'#888', txt:'#fff', abbr:m[1] };
+  return CMP[name] || { bg:'#888', txt:'#fff', abbr:name[0] };
+}
+
+// ══════════════════════════════════════════════════════
+// Team data
+// ══════════════════════════════════════════════════════
+const TEAM_CLR = {
+  HAM:'#00D2BE',BOT:'#00D2BE',ROS:'#00D2BE',
+  VET:'#DC0000',RAI:'#DC0000',LEC:'#DC0000',
+  VER:'#1E41FF',RIC:'#1E41FF',GAS:'#1E41FF',ALB:'#1E41FF',
+  NOR:'#FF8700',SAI:'#FF8700',VAN:'#FF8700',ALO:'#FF8700',
+  HUL:'#FFD700',MAG:'#787878',
+  PER:'#2293D1',OCO:'#2293D1',STR:'#2293D1',MAS:'#2293D1',
+  KVY:'#1660AD',GRO:'#787878',
+  KUB:'#37BEDD',RUS:'#37BEDD',
+  GIO:'#9B9FA2',ERI:'#9B9FA2',WEH:'#9B9FA2',
+};
+
+const TEAM_NAME = {
+  HAM:'Mercedes',BOT:'Mercedes',ROS:'Mercedes',
+  VET:'Ferrari', RAI:'Ferrari', LEC:'Ferrari',
+  VER:'Red Bull',RIC:'Red Bull',GAS:'Red Bull',ALB:'Red Bull',
+  NOR:'McLaren', SAI:'McLaren / Renault',VAN:'McLaren',ALO:'McLaren',
+  HUL:'Renault', MAG:'Haas',
+  PER:'Force India',OCO:'Force India',STR:'Williams',MAS:'Williams',
+  KVY:'Toro Rosso',GRO:'Haas',
+  KUB:'Williams', RUS:'Williams',
+  GIO:'Sauber',   ERI:'Sauber', WEH:'Sauber',
+};
+
+const DRIVER_NAME = {
+  HAM: 'Hamilton',
+  BOT: 'Bottas',
+  VER: 'Verstappen',
+  PER: 'Perez',
+  LEC: 'Leclerc',
+  SAI: 'Sainz',
+  NOR: 'Norris',
+  PIA: 'Piastri',
+  ALO: 'Alonso',
+  STR: 'Stroll',
+  RUS: 'Russell',
+  GAS: 'Gasly',
+  OCO: 'Ocon',
+  ALB: 'Albon',
+  TSU: 'Tsunoda',
+  HUL: 'Hulkenberg',
+  MAG: 'Magnussen',
+  ZHO: 'Zhou',
+  BOT: 'Bottas',
+  DEV: 'De Vries',
+  RIC: 'Ricciardo',
+  VET: 'Vettel',
+  RAI: 'Raikkonen',
+  ROS: 'Rosberg',
+  MAS: 'Massa',
+  GRO: 'Grosjean',
+  KVY: 'Kvyat',
+  ERI: 'Ericsson',
+  WEH: 'Wehrlein',
+  GIO: 'Giovinazzi',
+  KUB: 'Kubica',
+  GUT: 'Gutierrez',
+  BUT: 'Button',
+  SUT: 'Sutil',
+  MAL: 'Maldonado',
+  NAS: 'Nasr'
+};
+
+// ══════════════════════════════════════════════════════
+// Status pip
+// ══════════════════════════════════════════════════════
+function setPip(state) {
+  const p = document.getElementById('status-pip');
+  p.style.background =
+    state==='run' ? 'rgba(255,255,255,0.9)'
+  : state==='ok'  ? '#3DBA5E'
+  : 'rgba(255,255,255,0.25)';
+}
+
+// ══════════════════════════════════════════════════════
+// Simulation
+// ══════════════════════════════════════════════════════
+async function runSimulation() {
+  const race   = document.getElementById('race-select').value;
+  const btn    = document.getElementById('sim-btn');
+  const status = document.getElementById('sim-status');
+  const err    = document.getElementById('sim-error');
+  const resEl  = document.getElementById('sim-results');
+
+  if (!race) return;
+  btn.disabled = true;
+  status.classList.add('visible');
+  document.getElementById('sim-status-text').textContent = `Running ${race.replace(/_/g,' ')}…`;
+  err.style.display = 'none';
+  resEl.style.display = 'none';
+  setPip('run');
+
+  try {
+    const r    = await fetch('/simulate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ race })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Simulation failed');
+    renderSim(data);
+    resEl.style.display = 'block';
+    document.getElementById('topbar-ctx').textContent = race.replace(/_/g,' ');
+    setPip('ok');
+  } catch(e) {
+    err.textContent = e.message;
+    err.style.display = 'block';
+    setPip('idle');
+  } finally {
+    btn.disabled = false;
+    status.classList.remove('visible');
+  }
+}
+
+function parseSegs(str, total) {
+  const ms = [...str.matchAll(/\[lap (\d+):\s*([^\]]+)\]/g)]
+    .map(m => ({ lap: parseInt(m[1]), compound: m[2].trim() }));
+  if (!ms.length) return [];
+  return ms.map((m, i) => {
+    const end = i + 1 < ms.length ? ms[i+1].lap : total;
+    return { compound: m.compound, pct: Math.max(((end-m.lap)/total)*100, 1.5) };
+  });
+}
+
+function renderSim(d) {
+  const rows   = d.rows;
+  const maxLap = rows.length ? Math.max(...rows.map(r=>parseInt(r.laps)||0)) : 60;
+
+  // Podium
+  const fin     = rows.filter(r=>r.status!=='DNF');
+  const winner  = fin[0];
+  const fastest = rows.reduce((a,b)=>
+    (parseFloat(a.best_lap)||999)<(parseFloat(b.best_lap)||999)?a:b);
+  const topStop = rows.reduce((a,b)=>{
+    const ca=[...a.strategy.matchAll(/lap \d+:/g)].length-1;
+    const cb=[...b.strategy.matchAll(/lap \d+:/g)].length-1;
+    return ca>cb?a:b;
+  });
+
+  const cells = [
+    { lbl:'Winner', drv:DRIVER_NAME[winner?.driver] || winner?.driver || '—', team:TEAM_NAME[winner?.driver]||'',
+      val: winner?winner.t_race+'s':'', ghost:'01' },
+    { lbl:'Fastest Lap', drv:DRIVER_NAME[fastest?.driver] || fastest?.driver || '—', team:TEAM_NAME[fastest?.driver]||'',
+      val: fastest?fastest.best_lap+'s':'', ghost:'⚡' },
+    { lbl:'Most Stops', drv:DRIVER_NAME[topStop?.driver] || topStop?.driver || '—', team:TEAM_NAME[topStop?.driver]||'',
+      val: ([...topStop?.strategy.matchAll(/lap \d+:/g)||[]].length-1)+' stops', ghost:'🔧' },
+  ];
+
+  document.getElementById('sim-podium').innerHTML = cells.map(c=>`
+    <div class="podium-cell">
+      <div class="podium-ghost">${c.ghost}</div>
+      <div class="podium-lbl">${c.lbl}</div>
+      <div class="podium-drv">${c.drv}</div>
+      <div class="podium-team">${c.team}</div>
+      <div class="podium-val">${c.val}</div>
+    </div>`).join('');
+
+  // Meta
+  let meta = `<div class="meta-chip ok">✓ Finished</div>
+    <div class="meta-chip">${maxLap} Laps</div>`;
+  meta += !d.fcy?.length ? '<div class="meta-chip">No FCY</div>'
+    : `<div class="meta-chip">FCY: ${d.fcy}</div>`;
+  meta += !d.retirements?.length ? '<div class="meta-chip">No Retirements</div>'
+    : `<div class="meta-chip">Retirements: ${d.retirements}</div>`;
+  document.getElementById('sim-meta').innerHTML = meta;
+
+  // Timeline
+  const cmpsUsed = new Set();
+  rows.forEach(r=>[...r.strategy.matchAll(/lap \d+: ([\w\s()]+?)(?= ->|$)/g)]
+    .forEach(m=>cmpsUsed.add(m[1].trim())));
+
+  document.getElementById('tl-legend').innerHTML =
+    [...cmpsUsed].map(c=>{
+      const {bg}=resolveCmp(c);
+      return `<div class="tl-legend-item"><div class="tl-swatch" style="background:${bg}"></div>${c}</div>`;
+    }).join('');
+
+  document.getElementById('tl-chart').innerHTML = rows
+    .filter(r=>r.status!=='DNF')
+    .map(r=>{
+      const segs = parseSegs(r.strategy, maxLap);
+      const stops = segs.length-1;
+      const bars = segs.map(s=>{
+        const {bg,txt,abbr}=resolveCmp(s.compound);
+        return `<div class="tl-seg" style="width:${s.pct}%;background:${bg}">
+          <span class="tl-seg-lbl" style="color:${txt}">${s.pct>7?abbr:''}</span>
+        </div>`;
+      }).join('');
+      return `<div class="tl-row">
+        <div class="tl-drv">${DRIVER_NAME[r.driver] || r.driver}</div>
+        <div class="tl-bar">${bars}</div>
+        <div class="tl-stops">${stops}S</div>
+      </div>`;
+    }).join('');
+
+  // Table
+  document.getElementById('sim-count').textContent =
+    `${rows.length} DRIVERS · SORTED BY POSITION`;
+
+  document.getElementById('sim-tbody').innerHTML = rows.map(r=>{
+    const dnf  = r.status==='DNF';
+    const pos  = parseInt(r.pos);
+    const pCls = dnf?'pos-dnf':pos===1?'pos-1':pos===2?'pos-2':pos===3?'pos-3':'';
+    const bar  = TEAM_CLR[r.driver]||'#ccc';
+    const badge= dnf
+      ? '<span class="st-dnf">DNF</span>'
+      : '<span class="st-fin">FIN</span>';
+    return `<tr>
+      <td class="td-pos ${pCls}">${r.pos.padStart(2,'0')}</td>
+      <td><div class="drv-wrap">
+        <div class="drv-bar" style="background:${bar}"></div>
+        <div>
+          <div class="drv-name">${DRIVER_NAME[r.driver] || r.driver}</div>
+          <div class="drv-team">${TEAM_NAME[r.driver]||''}</div>
+        </div>
+      </div></td>
+      <td class="td-dim">${r.car}</td>
+      <td class="td-val">${dnf?'—':r.t_race+'s'}</td>
+      <td class="td-dim">${dnf?'—':(r.gap||'—')}</td>
+      <td class="td-dim">${dnf?'—':(r.interval||'—')}</td>
+      <td class="td-val">${r.best_lap}s</td>
+      <td class="td-dim">${r.laps}</td>
+      <td>${badge}</td>
+      <td class="strat-cell">${r.strategy}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('sim-raw').textContent = d.raw;
+
+  if (d.vse_probs) initVse(d.vse_probs, d.rows, d.cc_probs || null);
+  else {
+    document.getElementById('vse-controls').style.display='none';
+    document.getElementById('vse-tabs').style.display='none';
+    document.getElementById('vse-canvas-wrap').style.display='none';
+    document.getElementById('nn2-panel').style.display='none';
+    document.getElementById('vse-empty').style.display='block';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// Model Evaluation
+// ══════════════════════════════════════════════════════
+async function runEvaluation() {
+  const status = document.getElementById('eval-status');
+  const err    = document.getElementById('eval-error');
+  const res    = document.getElementById('eval-results');
+
+  status.classList.add('visible');
+  err.style.display='none';
+  res.style.display='none';
+
+  try {
+    const r    = await fetch('/evaluate',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:'{}'
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error||'Evaluation failed');
+    renderEval(data);
+    res.style.display='block';
+    document.getElementById('hdr-tc').style.display='flex';
+    document.getElementById('hdr-cc').style.display='flex';
+    document.getElementById('hdr-tc-val').textContent=data.tc.f1;
+    document.getElementById('hdr-cc-val').textContent=data.cc.accuracy;
+  } catch(e) {
+    err.textContent=e.message;
+    err.style.display='block';
+  } finally {
+    status.classList.remove('visible');
+  }
+}
+
+function vColor(v) {
+  const n=parseFloat(v);
+  return n>=0.75?'v-good':n>=0.45?'v-warn':'v-bad';
+}
+
+function metricCell(val, lbl, desc) {
+  return `<div class="metric-cell">
+    <div class="metric-cell-lbl">${lbl}</div>
+    <div class="metric-cell-val ${vColor(val)}">${val}</div>
+    <div class="metric-cell-desc">${desc}</div>
+  </div>`;
+}
+
+function renderEval(d) {
+  const tc=d.tc, cc=d.cc;
+
+  document.getElementById('badge-tc').innerHTML=`F1 <span>${tc.f1}</span>`;
+  document.getElementById('badge-cc').innerHTML=`Acc <span>${cc.accuracy}</span>`;
+
+  document.getElementById('tc-meta-samples').textContent=
+    `${tc.samples.toLocaleString()} laps evaluated`;
+  const pitPct=((tc.tp+tc.fn)/tc.samples*100).toFixed(2);
+  document.getElementById('tc-meta-balance').textContent=
+    `${pitPct}% pit events`;
+
+  document.getElementById('tc-metrics').innerHTML=
+    metricCell(tc.accuracy, 'Accuracy',  'Overall correct predictions')+
+    metricCell(tc.precision,'Precision', 'Predicted pits that were real')+
+    metricCell(tc.recall,   'Recall',    'Real pits that were caught')+
+    metricCell(tc.f1,       'F1 Score',  'Harmonic mean · rare-class quality');
+
+  document.getElementById('tc-cm').innerHTML=`
+    <div class="cm-cell cm-tp"><div class="cm-val">${tc.tp.toLocaleString()}</div><div class="cm-lbl">True Pos</div></div>
+    <div class="cm-cell cm-fp"><div class="cm-val">${tc.fp.toLocaleString()}</div><div class="cm-lbl">False Pos</div></div>
+    <div class="cm-cell cm-fn"><div class="cm-val">${tc.fn.toLocaleString()}</div><div class="cm-lbl">False Neg</div></div>
+    <div class="cm-cell cm-tn"><div class="cm-val">${tc.tn.toLocaleString()}</div><div class="cm-lbl">True Neg</div></div>`;
+
+  document.getElementById('tc-cm-img').src=tc.cm_img;
+  document.getElementById('tc-bar-img').src=tc.bar_img;
+
+  document.getElementById('cc-meta-samples').textContent=
+    `${cc.samples.toLocaleString()} pit stops evaluated`;
+
+  document.getElementById('cc-metrics').innerHTML=
+    metricCell(cc.accuracy,  'Accuracy',  'Overall compound accuracy')+
+    metricCell(cc.f1_hard,   'F1 Hard',   'Hard compound detection')+
+    metricCell(cc.f1_medium, 'F1 Medium', 'Medium compound detection')+
+    metricCell(cc.f1_soft,   'F1 Soft',   'Soft compound detection');
+
+  document.getElementById('cc-cm-img').src=cc.cm_img;
+  document.getElementById('cc-bar-img').src=cc.bar_img;
+}
+
+// ══════════════════════════════════════════════════════
+// VSE Viewer — NN1 + NN2
+// ══════════════════════════════════════════════════════
+let vseData=null, vseMap={}, vsePlaying=false;
+let vseLap=0, vseMax=0, vseFrame=null;
+let ccData=null;           // cc_probs from app.py
+let activeVseTab='nn1';    // 'nn1' | 'nn2'
+let activeNn2Driver=null;
+
+// ── Tab switching ──
+function switchVseTab(tab, el) {
+  activeVseTab = tab;
+  document.querySelectorAll('.vse-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  const canvas = document.getElementById('vse-canvas-wrap');
+  const nn2    = document.getElementById('nn2-panel');
+  const playBtn = document.getElementById('vse-play-btn');
+  const d2Field = document.getElementById('vse-d2').closest('.ctrl-field');
+
+  if (tab === 'nn1') {
+    canvas.style.display = 'block';
+    nn2.style.display    = 'none';
+    playBtn.style.display = '';
+    d2Field.style.display = '';
+  } else {
+    canvas.style.display = 'none';
+    nn2.style.display    = 'block';
+    playBtn.style.display = 'none';
+    d2Field.style.display = 'none';
+    renderNn2(document.getElementById('vse-d1').value);
+  }
+}
+
+// ── Init (called after simulation) ──
+function initVse(probs, rows, cc) {
+  vseData = probs;
+  ccData  = cc;
+  rows.forEach(r => { vseMap[r.driver] = r.strategy; });
+
+  const drivers = Object.keys(vseData).sort();
+  const s1 = document.getElementById('vse-d1');
+  const s2 = document.getElementById('vse-d2');
+  s1.innerHTML = drivers.map(d => `<option>${d}</option>`).join('');
+  s2.innerHTML = '<option value="">None</option>' +
+    drivers.map(d => `<option>${d}</option>`).join('');
+  activeNn2Driver = drivers[0];
+
+  document.getElementById('vse-controls').style.display = 'flex';
+  document.getElementById('vse-tabs').style.display     = 'flex';
+  document.getElementById('vse-canvas-wrap').style.display = 'block';
+  document.getElementById('nn2-panel').style.display    = 'none';
+  document.getElementById('vse-empty').style.display    = 'none';
+
+  // reset to NN1 tab
+  document.querySelectorAll('.vse-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === 0);
+  });
+  activeVseTab = 'nn1';
+
+  vseMax = Math.max(...drivers.map(d => Math.max(...vseData[d].laps)));
+  document.getElementById('vse-lap-tot').textContent = vseMax;
+  document.getElementById('vse-scrubber').max = vseMax;
+  vseLap = vseMax;
+  document.getElementById('vse-scrubber').value = vseMax;
+  drawVse();
+}
+
+function onDriverChange() {
+  activeNn2Driver = document.getElementById('vse-d1').value;
+  vseLap = vseMax;
+  document.getElementById('vse-scrubber').value = vseMax;
+  if (activeVseTab === 'nn1') drawVse();
+  else renderNn2(activeNn2Driver);
+}
+
+function onScrub() {
+  vseLap = parseInt(document.getElementById('vse-scrubber').value);
+  drawVse();
+}
+
+function togglePlay() {
+  vsePlaying = !vsePlaying;
+  document.getElementById('vse-play-btn').textContent = vsePlaying ? '⏸ Pause' : '▶ Play';
+  if (vsePlaying) { vseLap = 0; animateVse(); }
+  else clearTimeout(vseFrame);
+}
+
+function animateVse() {
+  if (!vsePlaying) return;
+  vseLap++;
+  if (vseLap > vseMax) {
+    vsePlaying = false;
+    document.getElementById('vse-play-btn').textContent = '▶ Play';
+    vseLap = vseMax; drawVse(); return;
+  }
+  document.getElementById('vse-scrubber').value = vseLap;
+  drawVse();
+  vseFrame = setTimeout(() => requestAnimationFrame(animateVse), 80);
+}
+
+function pitLaps(str) {
+  return [...(str||'').matchAll(/lap (\d+):/g)].map(m=>parseInt(m[1])).filter(l=>l>0);
+}
+
+// ── NN1 Canvas ──
+function drawVse() {
+  if (!vseData) return;
+  const canvas = document.getElementById('vse-canvas');
+  const ctx    = canvas.getContext('2d');
+  const W      = canvas.offsetWidth || canvas.width;
+  canvas.width = W;
+  const H=400, P={t:32,b:44,l:48,r:20};
+  const pw=W-P.l-P.r, ph=H-P.t-P.b;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#10141C'; ctx.fillRect(0,0,W,H);
+  document.getElementById('vse-lap').textContent = vseLap;
+
+  [0,25,50,75,100].forEach(p => {
+    const y = P.t + ph*(1-p/100);
+    ctx.strokeStyle='#1E2536'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(P.l,y); ctx.lineTo(W-P.r,y); ctx.stroke();
+    ctx.fillStyle='#5A6380'; ctx.font='9px JetBrains Mono'; ctx.textAlign='right';
+    ctx.fillText(p+'%', P.l-6, y+3);
+  });
+
+  const y50 = P.t + ph*0.5;
+  ctx.strokeStyle='#E10600'; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(P.l,y50); ctx.lineTo(W-P.r,y50); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#E10600'; ctx.font='bold 8px JetBrains Mono'; ctx.textAlign='left';
+  ctx.fillText('PIT THRESHOLD 50%', P.l+6, y50-5);
+
+  const xFor = l => P.l + pw*(l/vseMax);
+  const d1   = document.getElementById('vse-d1').value;
+  const d2   = document.getElementById('vse-d2').value;
+  const legs = [];
+
+  function drawLine(code, color) {
+    if (!code || !vseData[code]) return;
+    const dv  = vseData[code];
+    const vis = dv.laps.filter(l => l <= vseLap);
+    if (!vis.length) return;
+
+    ctx.strokeStyle=color; ctx.lineWidth=2;
+    ctx.beginPath();
+    vis.forEach((l,i) => {
+      const prob = dv.probs[dv.laps.indexOf(l)];
+      const x=xFor(l), y=P.t+ph*(1-prob);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    pitLaps(vseMap[code]||'').forEach(pl => {
+      if (pl > vseLap) return;
+      const x = xFor(pl);
+      ctx.strokeStyle='#E10600'; ctx.lineWidth=1.5; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(x,P.t); ctx.lineTo(x,H-P.b); ctx.stroke();
+    });
+
+    const last  = vis[vis.length-1];
+    const lp    = dv.probs[dv.laps.indexOf(last)];
+    ctx.fillStyle=color;
+    ctx.beginPath(); ctx.arc(xFor(last), P.t+ph*(1-lp), 3.5, 0, Math.PI*2); ctx.fill();
+    legs.push({code, color, lp});
+  }
+
+  drawLine(d1, '#C8A84B');
+  if (d2) drawLine(d2, '#4A8FD4');
+
+  ctx.fillStyle='#5A6380'; ctx.font='8px JetBrains Mono'; ctx.textAlign='center';
+  ctx.fillText('LAP', W/2, H-10);
+
+  let lx = P.l;
+  legs.forEach(leg => {
+    ctx.fillStyle=leg.color; ctx.fillRect(lx,10,8,8);
+    ctx.fillStyle='#D4D8E8'; ctx.font='10px JetBrains Mono'; ctx.textAlign='left';
+    ctx.fillText(
+      `${DRIVER_NAME[leg.code] || leg.code} ${(leg.lp*100).toFixed(1)}%`,
+      lx+14,
+      18
+    );
+    lx += 130;
+  });
+}
+
+// ── NN2 Compound Choice Panel ──
+function renderNn2(driver) {
+  if (!ccData) {
+    document.getElementById('nn2-content').innerHTML =
+      '<div class="nn2-empty">NO NN2 DATA — CC logging may not be enabled in vse_supervised.py</div>';
+    return;
+  }
+
+  // Build driver tab strip
+  const drivers = Object.keys(ccData).sort();
+  const tabsEl  = document.getElementById('nn2-drv-tabs');
+  tabsEl.innerHTML = drivers.map(d => `
+    <div class="nn2-drv-tab ${d===driver?'active':''}"
+         onclick="selectNn2Driver('${d}',this)">${d}</div>`
+  ).join('');
+
+  const stops = ccData[driver];
+  if (!stops || !stops.length) {
+    document.getElementById('nn2-content').innerHTML =
+      `<div class="nn2-empty">NO PIT STOPS RECORDED FOR ${driver}</div>`;
+    return;
+  }
+
+  const html = `<div class="nn2-stops">` +
+    stops.map((stop, idx) => {
+      const lapLabel = stop.lap != null ? `LAP <span>${stop.lap}</span>` : `PIT ${idx+1}`;
+      const chosenCmp = stop.chosen || '—';
+      const { bg: chosenBg, txt: chosenTxt } = resolveCmp(chosenCmp);
+
+      const optBars = stop.options.map(opt => {
+        const { bg, txt, abbr } = resolveCmp(opt.name);
+        const isChosen = opt.name === chosenCmp;
+        const pct = (opt.prob * 100).toFixed(1);
+        return `
+          <div class="nn2-option ${isChosen?'chosen':''}">
+            <div class="nn2-option-name">
+              <div class="nn2-cmp-dot" style="background:${bg}"></div>
+              ${abbr}${isChosen ? ' ✓' : ''}
+            </div>
+            <div class="nn2-bar-track">
+              <div class="nn2-bar-fill" style="width:${opt.prob*100}%;background:${isChosen?bg:'#C8CAD4'}"></div>
+            </div>
+            <div class="nn2-option-pct">${pct}%</div>
+          </div>`;
+      }).join('');
+
+      return `
+        <div class="nn2-stop-card">
+          <div class="nn2-stop-hdr">
+            <div class="nn2-stop-lap">${lapLabel}</div>
+            <div class="nn2-stop-chosen" style="background:${chosenBg};color:${chosenTxt}">
+              ${chosenCmp}
+            </div>
+          </div>
+          <div class="nn2-options">${optBars}</div>
+        </div>`;
+    }).join('') + `</div>`;
+
+  document.getElementById('nn2-content').innerHTML = html;
+}
+
+function selectNn2Driver(driver, el) {
+  activeNn2Driver = driver;
+  document.querySelectorAll('.nn2-drv-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('vse-d1').value = driver;
+  renderNn2(driver);
+}
+
+window.addEventListener('DOMContentLoaded', runEvaluation);
+</script>
+</body>
+</html>
