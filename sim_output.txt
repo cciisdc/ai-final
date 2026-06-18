@@ -1,0 +1,48 @@
+﻿python : C:\Users\HP\race-simulation\main_racesim.py:8: 
+DeprecationWarning: pkg_resources is deprecated as an API. See 
+https://setuptools.pypa.io/en/latest/pkg_resources.html
+At line:1 char:1
++ python main_racesim.py 2>&1 | Out-File -FilePath sim_output.txt 
+-Enco ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\HP\rac..._resou 
+   rces.html:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  import pkg_resources
+INFO: Loading race parameters...
+INFO: Loading MCS parameters...
+INFO: Checking user input...
+INFO: FCY phases for the race simulation were set as follows: []
+INFO: Retirements for the race simulation were set as follows: []
+INFO: Starting simulations...
+
+INFO: Simulation progress: |ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê| 100.0% 
+INFO: There were 0 invalid races!
+INFO: Simulation runtime: 0.231s (230.521ms per race)
+INFO: Postprocessing in progress...
+RESULT: Simulation result:
+     pos  carno   t_race    gap    int  best_t_lap  no_laps status                                  strategy_info
+LEC    1     16 4903.682  0.000  0.000      68.154       71      F                          [0, 'A6'], [22, 'A3']
+VER    2     33 4914.647 10.965 10.965      68.517       71      F                          [0, 'A4'], [31, 'A3']
+BOT    3     77 4940.021 36.339 25.375      68.919       71      F                          [0, 'A4'], [21, 'A3']
+HAM    4     44 4940.521 36.839  0.500      68.510       71      F                          [0, 'A4'], [30, 'A3']
+ALB    5     23 4940.064     1l     1l      69.142       70      F                          [0, 'A4'], [35, 'A3']
+RAI    6      7 4940.564     1l  0.500      69.111       70      F                          [0, 'A6'], [23, 'A3']
+RIC    7      3 4941.064     1l  0.500      68.761       70      F                          [0, 'A4'], [46, 'A6']
+VET    8      5 4941.564     1l  0.500      68.024       70      F              [0, 'A6'], [21, 'A3'], [50, 'A6']
+NOR    9      4 4969.146     1l 27.582      69.884       70      F                          [0, 'A6'], [25, 'A4']
+GIO   10     99 4969.646     1l  0.500      69.884       70      F                          [0, 'A6'], [24, 'A3']
+GAS   11     10 4970.146     1l  0.500      69.884       70      F                          [0, 'A6'], [25, 'A3']
+STR   12     18 4970.646     1l  0.500      69.418       70      F                          [0, 'A4'], [25, 'A3']
+PER   13     11 4971.146     1l  0.500      69.287       70      F                          [0, 'A4'], [28, 'A3']
+RUS   14     63 4920.557     2l     1l      70.407       69      F                          [0, 'A4'], [27, 'A3']
+HUL   15     27 4921.057     2l  0.500      70.407       69      F                          [0, 'A4'], [26, 'A3']
+KVY   16     26 4921.557     2l  0.500      70.681       69      F                          [0, 'A4'], [32, 'A3']
+SAI   17     55 4922.591     2l  1.034      70.628       69      F                          [0, 'A4'], [41, 'A3']
+GRO   18      8 4923.091     2l  0.500      69.667       69      F                          [0, 'A4'], [34, 'A3']
+KUB   19     88 4949.053     2l 25.962      70.908       69      F                          [0, 'A4'], [19, 'A3']
+MAG   20     20 4959.803     2l 10.750      69.720       69      F  [0, 'A6'], [11, 'A3'], [13, 'A3'], [62, 'A6']
+RESULT: No FCY phases!
+RESULT: No retirements!
+INFO: Simulation finished successfully!
