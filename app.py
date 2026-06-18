@@ -1,7 +1,7 @@
 """
 app.py  —  VSE Web Interface
 ==============================
-Flask web app for the Virtual Strategy Engineer (Heilmeier et al.)
+Flask web app for VSE
 Provides two features:
   1. Evaluate the TC/CC neural networks on a chosen season
   2. Run the Monte Carlo race simulation for a chosen race .ini
@@ -27,7 +27,7 @@ warnings.filterwarnings("ignore")
 app = Flask(__name__)
 
 # ---------------------------------------------------------------------------
-# Paths  — adjust _BASE to wherever this file sits relative to the repo
+# Paths
 # ---------------------------------------------------------------------------
 _BASE    = os.path.dirname(os.path.abspath(__file__))
 VSE_DIR  = os.path.join(_BASE, "racesim", "input", "vse")
@@ -63,13 +63,6 @@ DARK = {
 
 # ---------------------------------------------------------------------------
 # Season-correct relative compound (A1-A7) -> display name mapping.
-#
-# strategy_info stores raw relative compound codes (e.g. 'A2', 'A3', 'I',
-# 'W'), never display names. The meaning of A1-A7 changes by season (A1 is
-# always the hardest compound nominated that year, A7 the softest), so a
-# single static code->name table cannot be correct for more than one
-# season. This table is sourced from each season's race-weekend tyre
-# nomination records.
 # ---------------------------------------------------------------------------
 SEASON_COMPOUND_NAMES = {
     2014: {"A1": "Hard", "A2": "Medium", "A3": "Soft", "A4": "Supersoft"},
@@ -118,19 +111,7 @@ def build_strategy_string(raw_strategy: str, season: int) -> str:
     return " -> ".join(segments)
 
 def build_cc_probs(race_season, available_compounds, driver_map, rows_raw_strategy):
-    """Reads vse_cc_probs.csv (logged live by vse_supervised.py) and
-    returns, per driver, the NN2 compound-choice probabilities at each
-    pit-stop lap, labeled with season-correct compound names.
-
-    Important: the CC log's 'lap' column is vse_supervised.py's internal
-    self.lap_counter, which increments once per make_decision() call -
-    this is NOT the same as the actual race lap number used in
-    strategy_info (make_decision can be invoked more than once per real
-    lap, e.g. during FCY rechecks). The two numbering systems cannot be
-    matched by value. Instead, we match them by chronological order: a
-    driver's Nth logged pit-stop decision corresponds to their Nth actual
-    pit stop in strategy_info, since both are recorded in the same
-    real-world sequence."""
+    
     cc_log_path = os.path.join(_BASE, "vse_cc_probs.csv")
     if not os.path.exists(cc_log_path) or not driver_map:
         return None
@@ -174,10 +155,6 @@ def build_cc_probs(race_season, available_compounds, driver_map, rows_raw_strate
     except Exception:
         return None
 
-# Approximate 2014-2019 era team colors / names by driver initials.
-# Drivers who changed teams across seasons are mapped to their most
-# associated team for this era; good enough for a visual accent, not
-# meant to be season-exact.
 TEAM_COLORS = {
     "HAM": "#00D2BE", "BOT": "#00D2BE", "ROS": "#00D2BE",            # Mercedes
     "VET": "#E10600", "RAI": "#E10600", "LEC": "#E10600",            # Ferrari
@@ -335,13 +312,6 @@ def make_metrics_chart(metrics, title, paper_ref=None):
 # ---------------------------------------------------------------------------
 
 def parse_sim_output(raw: str):
-    """Extract result table rows and metadata from main_racesim.py stdout.
-    The strategy_info column (last column) is now the original racesim
-    format - a stringified list of [lap, code] pairs like
-    "[0, 'A3'], [28, 'A2']" - which contains spaces and commas, so it
-    can't be split on whitespace like the other columns. We instead find
-    the fixed-width columns first, then take everything after them as the
-    raw strategy string verbatim."""
     lines = raw.splitlines()
     rows, fcy, retirements = [], [], []
     in_table = False
@@ -416,11 +386,6 @@ def index():
 
 @app.route("/evaluate", methods=["POST"])
 def evaluate():
-    # 2019 is fixed as the designated held-out test set. Heilmeier et al.'s
-    # original 10-fold cross-validation split was never published with the
-    # repo, so there is no recoverable "original" test set to re-create.
-    # 2019 is used here as a complete, self-contained season that the
-    # pre-trained model can be evaluated against without ambiguity.
     season = 2019
 
     tc_df = pd.read_csv(TC_CSV)
@@ -505,10 +470,8 @@ def simulate():
     except Exception:
         available_compounds = []
 
-    # Patch main_racesim.py to use the chosen ini, run it, capture output
     main_path = os.path.join(_BASE, "main_racesim.py")
 
-    # Read current main_racesim.py and temporarily swap the race_pars_file line
     with open(main_path, "r") as f:
         original = f.read()
 
@@ -550,8 +513,7 @@ def simulate():
 
     rows, fcy, retirements = parse_sim_output(output)
 
-    # --- build season-correct, human-readable strategy strings from the
-    #     raw [lap, code] pairs printed by racesim's original print_result() ---
+    #build season-correct, human-readable strategy strings from the raw [lap, code] pairs printed by racesim's original print_result() ---
     import re as _re
     race_season = get_season_from_race_name(race)
     rows_raw_pairs = {}
@@ -562,12 +524,12 @@ def simulate():
         ]
         row["strategy"] = build_strategy_string(row.pop("raw_strategy"), race_season)
 
-    # --- attach team color per driver (2014-2019 era constructors) ---
+    #attach team color per driver (2014-2019 era constructors) ---
     for row in rows:
         row["team_color"] = TEAM_COLORS.get(row["driver"], "#5a5a66")
         row["team_name"] = TEAM_NAMES.get(row["driver"], "")
 
-    # --- read live VSE probability log + driver index map (if VSE was used) ---
+    #read live VSE probability log + driver index map (if VSE was used) ---
     prob_log_path = os.path.join(_BASE, "vse_live_probs.csv")
     driver_map_path = os.path.join(_BASE, "vse_driver_map.json")
     vse_probs = None
@@ -578,8 +540,7 @@ def simulate():
                 driver_map = json.load(f)  # {"0": "RIC", "1": "NOR", ...}
 
             prob_df = pd.read_csv(prob_log_path)
-            # Normalize lap counter: make_decision can be called more than once per
-            # simulated lap (e.g. FCY rechecks) -> collapse to last call per (lap, driver)
+            # Normalize lap counter: make_decision can be called more than once per simulated lap (e.g. FCY rechecks) -> collapse to last call per (lap, driver)
             prob_df = prob_df.drop_duplicates(subset=["lap", "driver_idx"], keep="last")
             prob_df["driver"] = prob_df["driver_idx"].astype(str).map(driver_map)
 
